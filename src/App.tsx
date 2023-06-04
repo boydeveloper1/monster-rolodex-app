@@ -1,6 +1,6 @@
 // import { Component } from "react"; This is Unique to Class Component
 
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
 // import CardList from "./components/card-list/card-list.component"
 // import SearchBox from "./components/search-box/search-box.component"
 // import './App.css';
@@ -58,24 +58,41 @@ import logo from "./logo.svg";
 //     );
 //   }
 // }
+
+// This is a functional Component
+import { useState, useEffect, ChangeEvent } from "react";
+
 import CardList from "./components/card-list/card-list.component";
 import SearchBox from "./components/search-box/search-box.component";
 import "./App.css";
 
-// This is a functional Component
-import { useState, useEffect } from "react";
+import { getData } from "./utils/data.utils";
+
+export type Monster = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 const App = () => {
   const [searchField, setSearchField] = useState(""); //[value, setValue] // STATE
-  const [monsters, setMonsters] = useState([]); // STATE
+  const [monsters, setMonsters] = useState<Monster[]>([]); // STATE
   const [filteredMonsters, setFilteredMonsters] = useState(monsters);
   console.log("Rendered");
 
   // This function only calls when the app mounts. That's why nothing was passed in the array to prevent refiring.
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      // Code ln 18 is being passed to code ln 19
-      .then((response) => response.json())
-      .then((users) => setMonsters(users));
+    // fetch("https://jsonplaceholder.typicode.com/users")
+    //   // Code ln 18 is being passed to code ln 19
+    //   .then((response) => response.json())
+    //   .then((users) => setMonsters(users));
+    const fetchUsers = async () => {
+      const users = await getData<Monster[]>(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      setMonsters(users);
+    };
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -86,15 +103,17 @@ const App = () => {
     setFilteredMonsters(newFilteredMonsters);
   }, [monsters, searchField]);
 
-  const onSearchChange = (event) => {
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const searchFieldString = event.target.value.toLowerCase();
     setSearchField(searchFieldString);
   };
 
   return (
     <div className="App">
-      <h1 className="app-title">Adetayo's First React App</h1>
+      <h1 className="app-title">Begin a Search</h1>
+      <p className="para">You can search for your favorite monsters easily</p>
       {/* Imported Component  */}
+
       <SearchBox
         onChangeHandler={onSearchChange}
         placeholder="Search Monsters"
